@@ -12,13 +12,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+    "strconv"
 )
 
 func main() {
-	counts := make(map[string]int)
+	counts := make(map[string]map[string]int)
 	files := os.Args[1:]
 	if len(files) == 0 {
-		countLines(os.Stdin, counts)
+		countLines(os.Stdin, "Stdin", counts)
 	} else {
 		for _, arg := range files {
 			f, err := os.Open(arg)
@@ -26,21 +27,32 @@ func main() {
 				fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
 				continue
 			}
-			countLines(f, counts)
+			countLines(f, arg, counts)
 			f.Close()
 		}
 	}
-	for line, n := range counts {
-		if n > 1 {
-			fmt.Printf("%d\t%s\n", n, line)
-		}
+	for line, filename := range counts {
+        total := 0
+        str, sep := "", "" 
+        for name, n := range filename {
+            total += n
+            str += (sep + name + "[" + strconv.Itoa(n) + "]") 
+            sep = " " 
+        }
+	    if total > 1 {
+            fmt.Printf("%d\t%s\t(%s)\n", total, line, str)
+	    }
 	}
 }
 
-func countLines(f *os.File, counts map[string]int) {
+func countLines(f *os.File, filename string, counts map[string]map[string]int) {
 	input := bufio.NewScanner(f)
 	for input.Scan() {
-		counts[input.Text()]++
+        line := input.Text()
+        if counts[line] == nil {
+            counts[line] = make(map[string]int)
+        }
+        counts[line][filename]++
 	}
 	// NOTE: ignoring potential errors from input.Err()
 }

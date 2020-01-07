@@ -19,13 +19,17 @@ import (
 func main() {
 	start := time.Now()
 	ch := make(chan string)
+    file, err := os.OpenFile("fetchlog", os.O_APPEND|os.O_WRONLY, 0644)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "open file failed %v", err)
+    }
 	for _, url := range os.Args[1:] {
 		go fetch(url, ch) // start a goroutine
 	}
 	for range os.Args[1:] {
-		fmt.Println(<-ch) // receive from channel ch
+		fmt.Fprintln(file, <-ch) // receive from channel ch
 	}
-	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
+	fmt.Fprintf(file, "%.2fs elapsed\n", time.Since(start).Seconds())
 }
 
 func fetch(url string, ch chan<- string) {
