@@ -1,3 +1,9 @@
+This is just my own practicing about the book *The Go Programming Language*
+
+So I keep original README.md under this line
+
+---
+
 # The Go Programming Language
 
 This repository provides the downloadable example programs
