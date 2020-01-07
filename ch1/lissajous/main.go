@@ -32,8 +32,8 @@ import (
 var palette = []color.Color{color.White, color.RGBA{240,52,52,1}, color.RGBA{41, 241, 195, 1}, color.RGBA{30, 139, 195, 1}, color.RGBA{255, 255, 126, 1}} 
 
 const (
-	whiteIndex = 0 // first color in palette
-	redIndex = 1 // next color in palette
+    whiteIndex = 0  // first color in palette
+    redIndex = 1    // next color in palette
     greenIndex = 2
     blueIndex = 3
     yellowIndex = 4
