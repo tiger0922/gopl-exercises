@@ -19,19 +19,21 @@ package main
 import (
     "fmt"
     "os"
+    "sort"
 )
 
 func main() {
     for i := 1; i < len(os.Args); i++ {
         fmt.Printf("  %s\n", comma(os.Args[i]))
     }
+    fmt.Printf("  %t\n", anagram(os.Args[1], os.Args[2]))
 }
 
 //!+
 // comma inserts commas in a non-negative decimal integer string.
 func comma(s string) string {
     n := len(s)
-    for i:= n-1; i > 0; i-- {
+    for i := n-1; i > 0; i-- {
         if s[i] == '.' {
             n = i
             break
@@ -51,4 +53,48 @@ func comma(s string) string {
     return s
 }
 
+//My method : sorting and compare
+func anagram(s1, s2 string) bool {
+    if len(s1) != len(s2) {
+        return false
+    }
+    n1 := make([]int, len(s1))
+    n2 := make([]int, len(s2))
+
+    for i := 0; i < len(s1); i++ {
+        n1[i] = int(s1[i])-int('0')
+        n2[i] = int(s2[i])-int('0')
+    }
+    sort.Ints(n1)
+    sort.Ints(n2)
+    for i := 0; i < len(s1); i++ {
+        if n1[i] != n2[i] {
+            return false
+        }
+    }
+    return true
+
+}
+
+func isAnagram(a, b string) bool {
+    aFreq := make(map[rune]int)
+    for _, c := range a {
+        aFreq[c]++
+    }
+    bFreq := make(map[rune]int)
+    for _, c := range b {
+        bFreq[c]++
+    }
+    for k, v := range aFreq {
+        if bFreq[k] != v {
+            return false
+        }
+    }
+    for k, v := range bFreq {
+        if aFreq[k] != v {
+            return false
+        }
+    }
+    return true
+}
 //!-
