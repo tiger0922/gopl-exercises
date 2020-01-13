@@ -9,27 +9,27 @@
 package main
 
 import (
-	"image"
-	"image/color"
-	"image/gif"
-	"io"
-	"math"
-	"math/rand"
-	"os"
+    "image"
+    "image/color"
+    "image/gif"
+    "io"
+    "math"
+    "math/rand"
+    "os"
     "strconv"
 )
 
 //!-main
 // Packages not needed by version in book.
 import (
-	"log"
-	"net/http"
-	"time"
+    "log"
+    "net/http"
+    "time"
 )
 
 //!+main
 
-var palette = []color.Color{color.White, color.RGBA{240,52,52,1}, color.RGBA{41, 241, 195, 1}, color.RGBA{30, 139, 195, 1}, color.RGBA{255, 255, 126, 1}} 
+var palette = []color.Color{color.White, color.RGBA{240,52,52,255}, color.RGBA{41, 241, 195, 255}, color.RGBA{30, 139, 195, 255}, color.RGBA{255, 255, 126, 255}} 
 
 const (
     whiteIndex = 0  // first color in palette
@@ -40,15 +40,15 @@ const (
 )
 
 func main() {
-	//!-main
-	// The sequence of images is deterministic unless we seed
-	// the pseudo-random number generator using the current time.
-	// Thanks to Randall McPherson for pointing out the omission.
-	rand.Seed(time.Now().UTC().UnixNano())
+    //!-main
+    // The sequence of images is deterministic unless we seed
+    // the pseudo-random number generator using the current time.
+    // Thanks to Randall McPherson for pointing out the omission.
+    rand.Seed(time.Now().UTC().UnixNano())
 
-	if len(os.Args) > 1 && os.Args[1] == "web" {
-		//!+http
-		handler := func(w http.ResponseWriter, r *http.Request) {
+    if len(os.Args) > 1 && os.Args[1] == "web" {
+        //!+http
+        handler := func(w http.ResponseWriter, r *http.Request) {
             cycles  := 5
             res     := 0.001
             size    := 100
@@ -85,15 +85,15 @@ func main() {
                     }
                 }
             }
-			lissajous(w, cycles, res, size, nframe, delay)
-		}
-		http.HandleFunc("/", handler)
-		//!-http
-		log.Fatal(http.ListenAndServe("localhost:8000", nil))
-		return
-	}
-	//!+main
-	lissajous(os.Stdout, 5, 0.001, 100, 64, 8)
+            lissajous(w, cycles, res, size, nframe, delay)
+        }
+        http.HandleFunc("/", handler)
+        //!-http
+        log.Fatal(http.ListenAndServe("localhost:8000", nil))
+        return
+    }
+    //!+main
+    lissajous(os.Stdout, 5, 0.001, 100, 64, 8)
 }
 
 func lissajous(out io.Writer, Cycles int, Res float64, Size int, Nframes int, Delay int) {
@@ -104,23 +104,23 @@ func lissajous(out io.Writer, Cycles int, Res float64, Size int, Nframes int, De
     nframes := Nframes   // number of animation frames
     delay   := Delay     // delay between frames in 10ms units
 
-	freq := rand.Float64() * 3.0 // relative frequency of y oscillator
-	anim := gif.GIF{LoopCount: nframes}
-	phase := 0.0 // phase difference
-	for i := 0; i < nframes; i++ {
-		rect := image.Rect(0, 0, 2*size+1, 2*size+1)
-		img := image.NewPaletted(rect, palette)
-		for t := 0.0; t < float64(cycles)*2*math.Pi; t += res {
-			x := math.Sin(t)
-			y := math.Sin(t*freq + phase)
-			img.SetColorIndex(size+int(x*float64(size)+0.5), size+int(y*float64(size)+0.5),
-				uint8(t)/5%4+1)
-		}
-		phase += 0.1
-		anim.Delay = append(anim.Delay, delay)
-		anim.Image = append(anim.Image, img)
-	}
-	gif.EncodeAll(out, &anim) // NOTE: ignoring encoding errors
+    freq := rand.Float64() * 3.0 // relative frequency of y oscillator
+    anim := gif.GIF{LoopCount: nframes}
+    phase := 0.0 // phase difference
+    for i := 0; i < nframes; i++ {
+        rect := image.Rect(0, 0, 2*size+1, 2*size+1)
+        img := image.NewPaletted(rect, palette)
+        for t := 0.0; t < float64(cycles)*2*math.Pi; t += res {
+            x := math.Sin(t)
+            y := math.Sin(t*freq + phase)
+            img.SetColorIndex(size+int(x*float64(size)+0.5), size+int(y*float64(size)+0.5),
+            uint8(t)/5%4+1)
+        }
+        phase += 0.1
+        anim.Delay = append(anim.Delay, delay)
+        anim.Image = append(anim.Image, img)
+    }
+    gif.EncodeAll(out, &anim) // NOTE: ignoring encoding errors
 }
 
 //!-main
