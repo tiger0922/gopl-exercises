@@ -17,7 +17,7 @@ import (
 func main() {
 	//!+array
 	a := [...]int{0, 1, 2, 3, 4, 5}
-	reverse(a[:])
+	reverseA(&a)
 	fmt.Println(a) // "[5 4 3 2 1 0]"
 	//!-array
 
@@ -27,6 +27,8 @@ func main() {
 	reverse(s[:2])
 	reverse(s[2:])
 	reverse(s)
+	fmt.Println(s) // "[2 3 4 5 0 1]"
+    s = rotate(s)
 	fmt.Println(s) // "[2 3 4 5 0 1]"
 	//!-slice
 
@@ -57,4 +59,14 @@ func reverse(s []int) {
 	}
 }
 
+func reverseA(a *[6]int) {
+	for i, j := 0, len(*a)-1; i < j; i, j = i+1, j-1 {
+		a[i], a[j] = a[j], a[i]
+	}
+}
 //!-rev
+
+func rotate(s []int) []int {
+    s = append(s, s[0])
+    return s[1:]
+}
