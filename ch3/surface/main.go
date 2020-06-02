@@ -67,7 +67,7 @@ func dye(i, j int) color.Color {
     return color.RGBA{uint8(r), 0x00, uint8(b), 0x00}
 }
 
-func corner(i, j int) (float64, float64) {
+func corner(i, j int) (sx, sy float64) {
     // Find point (x,y) at corner of cell (i,j).
     x := xyrange * (float64(i)/cells - 0.5)
     y := xyrange * (float64(j)/cells - 0.5)
@@ -76,9 +76,9 @@ func corner(i, j int) (float64, float64) {
     z := f(x, y)
 
     // Project (x,y,z) isometrically onto 2-D SVG canvas (sx,sy).
-    sx := width/2 + (x-y)*cos30*xyscale
-    sy := height/2 + (x+y)*sin30*xyscale - z*zscale
-    return sx, sy
+    sx = width/2 + (x-y)*cos30*xyscale
+    sy = height/2 + (x+y)*sin30*xyscale - z*zscale
+    return
 }
 
 func eggbox(x, y float64) float64 {
