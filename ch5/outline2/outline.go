@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+    "strings"
 
 	"golang.org/x/net/html"
 )
@@ -65,15 +66,48 @@ var depth int
 
 func startElement(n *html.Node) {
 	if n.Type == html.ElementNode {
-		fmt.Printf("%*s<%s>\n", depth*2, "", n.Data)
+        str := ""
+        for i := 0; i < depth*2; i++ {
+            str += " "
+        }
+        str += "<"
+        str += n.Data
+        for _, v := range n.Attr {
+            str += " "
+            str += v.Key
+            str += "=\""
+            str += v.Val
+            str += "\""
+        }
+        if n.FirstChild == nil {
+            str += "/"
+        }
+        str += ">"
+        fmt.Println(str)
 		depth++
-	}
+	} else if n.Type == html.TextNode {
+        text := strings.TrimSpace(n.Data)
+        texts := strings.Split(text, "\n")
+        space := "\n"
+        for i := 0 ; i < depth; i++ {
+            space += "  "
+        }
+        text = strings.Join(texts, space)
+        if len(text) != 0 {
+            fmt.Printf("%*s%s\n", depth*2, "", text)
+        }
+    } else if n.Type == html.CommentNode {
+        fmt.Printf("<!--%s-->\n", n.Data)
+    }
 }
 
 func endElement(n *html.Node) {
 	if n.Type == html.ElementNode {
 		depth--
-		fmt.Printf("%*s</%s>\n", depth*2, "", n.Data)
+        check := n.FirstChild
+        if check != nil {
+            fmt.Printf("%*s</%s>\n", depth*2, "", n.Data)
+        }
 	}
 }
 
