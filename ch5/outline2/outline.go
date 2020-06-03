@@ -7,37 +7,37 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"os"
+    "fmt"
+    "net/http"
+    "os"
     "strings"
 
-	"golang.org/x/net/html"
+    "golang.org/x/net/html"
 )
 
 func main() {
-	for _, url := range os.Args[1:] {
-		outline(url)
-	}
+    for _, url := range os.Args[1:] {
+        outline(url)
+    }
 }
 
 func outline(url string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+    resp, err := http.Get(url)
+    if err != nil {
+        return err
+    }
+    defer resp.Body.Close()
 
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		return err
-	}
+    doc, err := html.Parse(resp.Body)
+    if err != nil {
+        return err
+    }
 
-	//!+call
-	forEachNode(doc, startElement, endElement)
-	//!-call
+    //!+call
+    forEachNode(doc, startElement, endElement)
+    //!-call
 
-	return nil
+    return nil
 }
 
 //!+forEachNode
@@ -46,17 +46,17 @@ func outline(url string) error {
 // pre is called before the children are visited (preorder) and
 // post is called after (postorder).
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
-	if pre != nil {
-		pre(n)
-	}
+    if pre != nil {
+        pre(n)
+    }
 
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		forEachNode(c, pre, post)
-	}
+    for c := n.FirstChild; c != nil; c = c.NextSibling {
+        forEachNode(c, pre, post)
+    }
 
-	if post != nil {
-		post(n)
-	}
+    if post != nil {
+        post(n)
+    }
 }
 
 //!-forEachNode
@@ -65,7 +65,7 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 var depth int
 
 func startElement(n *html.Node) {
-	if n.Type == html.ElementNode {
+    if n.Type == html.ElementNode {
         str := fmt.Sprintf("%*s<%s", depth*2, "", n.Data)
         for _, v := range n.Attr {
             str += fmt.Sprintf(` %s="%s"`, v.Key, v.Val)
@@ -75,8 +75,8 @@ func startElement(n *html.Node) {
         }
         str += ">"
         fmt.Println(str)
-		depth++
-	} else if n.Type == html.TextNode {
+        depth++
+    } else if n.Type == html.TextNode {
         text := strings.TrimSpace(n.Data)
         texts := strings.Split(text, "\n")
         space := fmt.Sprintf("\n%*s", depth*2, "")
@@ -90,13 +90,13 @@ func startElement(n *html.Node) {
 }
 
 func endElement(n *html.Node) {
-	if n.Type == html.ElementNode {
-		depth--
+    if n.Type == html.ElementNode {
+        depth--
         check := n.FirstChild
         if check != nil {
             fmt.Printf("%*s</%s>\n", depth*2, "", n.Data)
         }
-	}
+    }
 }
 
 //!-startend
