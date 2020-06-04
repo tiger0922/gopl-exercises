@@ -33,6 +33,42 @@ func outline(url string) error {
         return err
     }
 
+    var depth int
+
+    startElement := func(n *html.Node) {
+        if n.Type == html.ElementNode {
+            str := fmt.Sprintf("%*s<%s", depth*2, "", n.Data)
+            for _, v := range n.Attr {
+                str += fmt.Sprintf(` %s="%s"`, v.Key, v.Val)
+            }
+            if n.FirstChild == nil {
+                str += "/"
+            }
+            str += ">"
+            fmt.Println(str)
+            depth++
+        } else if n.Type == html.TextNode {
+            text := strings.TrimSpace(n.Data)
+            texts := strings.Split(text, "\n")
+            space := fmt.Sprintf("\n%*s", depth*2, "")
+            text = strings.Join(texts, space)
+            if len(text) != 0 {
+                fmt.Printf("%*s%s\n", depth*2, "", text)
+            }
+        } else if n.Type == html.CommentNode {
+            fmt.Printf("<!--%s-->\n", n.Data)
+        }
+    }
+
+    endElement := func(n *html.Node) {
+        if n.Type == html.ElementNode {
+            depth--
+            if n.FirstChild != nil {
+                fmt.Printf("%*s</%s>\n", depth*2, "", n.Data)
+            }
+        }
+    }
+
     //!+call
     forEachNode(doc, startElement, endElement)
     //!-call
@@ -62,41 +98,5 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 //!-forEachNode
 
 //!+startend
-var depth int
-
-func startElement(n *html.Node) {
-    if n.Type == html.ElementNode {
-        str := fmt.Sprintf("%*s<%s", depth*2, "", n.Data)
-        for _, v := range n.Attr {
-            str += fmt.Sprintf(` %s="%s"`, v.Key, v.Val)
-        }
-        if n.FirstChild == nil {
-            str += "/"
-        }
-        str += ">"
-        fmt.Println(str)
-        depth++
-    } else if n.Type == html.TextNode {
-        text := strings.TrimSpace(n.Data)
-        texts := strings.Split(text, "\n")
-        space := fmt.Sprintf("\n%*s", depth*2, "")
-        text = strings.Join(texts, space)
-        if len(text) != 0 {
-            fmt.Printf("%*s%s\n", depth*2, "", text)
-        }
-    } else if n.Type == html.CommentNode {
-        fmt.Printf("<!--%s-->\n", n.Data)
-    }
-}
-
-func endElement(n *html.Node) {
-    if n.Type == html.ElementNode {
-        depth--
-        check := n.FirstChild
-        if check != nil {
-            fmt.Printf("%*s</%s>\n", depth*2, "", n.Data)
-        }
-    }
-}
 
 //!-startend
