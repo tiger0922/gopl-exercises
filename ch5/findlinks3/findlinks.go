@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	"gopl.io/ch5/links"
+	"gopl-exercises/ch5/links"
 )
 
 //!+breadthFirst

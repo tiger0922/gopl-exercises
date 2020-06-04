@@ -7,63 +7,72 @@
 package main
 
 import (
-	"fmt"
-	"sort"
+    "fmt"
 )
 
 //!+table
 // prereqs maps computer science courses to their prerequisites.
 var prereqs = map[string][]string{
-	"algorithms": {"data structures"},
-	"calculus":   {"linear algebra"},
+    "algorithms":       {"data structures"},
+    "calculus":         {"linear algebra"},
+    "linear algebra":   {"calculus"},
 
-	"compilers": {
-		"data structures",
-		"formal languages",
-		"computer organization",
-	},
+    "compilers": {
+        "data structures",
+        "formal languages",
+        "computer organization",
+    },
 
-	"data structures":       {"discrete math"},
-	"databases":             {"data structures"},
-	"discrete math":         {"intro to programming"},
-	"formal languages":      {"discrete math"},
-	"networks":              {"operating systems"},
-	"operating systems":     {"data structures", "computer organization"},
-	"programming languages": {"data structures", "computer organization"},
+    "data structures":       {"discrete math"},
+    "databases":             {"data structures"},
+    "discrete math":         {"intro to programming"},
+    "formal languages":      {"discrete math"},
+    "networks":              {"operating systems"},
+    "operating systems":     {"data structures", "computer organization"},
+    "programming languages": {"data structures", "computer organization"},
 }
 
 //!-table
 
 //!+main
 func main() {
-	for i, course := range topoSort(prereqs) {
-		fmt.Printf("%d:\t%s\n", i+1, course)
-	}
+    depth = 0
+    for i, course := range topoSort(prereqs) {
+        fmt.Printf("%d:\t%s\n", i+1, course)
+    }
 }
 
+var depth int
+
 func topoSort(m map[string][]string) []string {
-	var order []string
-	seen := make(map[string]bool)
-	var visitAll func(items []string)
+    var order []string
+    seen := make(map[string]bool)
+    topdown := make(map[string]bool)
+    var visitAll func(items []string, topdown map[string]bool)
 
-	visitAll = func(items []string) {
-		for _, item := range items {
-			if !seen[item] {
-				seen[item] = true
-				visitAll(m[item])
-				order = append(order, item)
-			}
-		}
-	}
+    visitAll = func(items []string, topdown map[string]bool) {
+        for _, item := range items {
+            if depth == 0 {
+                topdown = make(map[string]bool)
+            }
+            if !seen[item] {
+                seen[item] = true
+                topdown[item] = true
+                depth++
+                visitAll(m[item], topdown)
+                depth--
+                order = append(order, item)
+            } else if topdown[item] {
+                fmt.Printf("Cycle detected at %s\n", item)
+            }
+        }
+    }
 
-	var keys []string
-	for key := range m {
-		keys = append(keys, key)
-	}
+    for k := range m {
+        visitAll([]string{k}, topdown)
+    }
 
-	sort.Strings(keys)
-	visitAll(keys)
-	return order
+    return order
 }
 
 //!-main
