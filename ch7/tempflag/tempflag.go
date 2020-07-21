@@ -9,8 +9,7 @@ package main
 import (
 	"flag"
 	"fmt"
-
-	"gopl.io/ch7/tempconv"
+	"gopl-exercises/ch7/tempconv"
 )
 
 //!+
